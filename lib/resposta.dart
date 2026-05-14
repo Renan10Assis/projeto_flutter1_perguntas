@@ -22,7 +22,7 @@ class Resposta extends StatelessWidget {
       child: FloatingActionButton(
         onPressed: onSelected,
         backgroundColor: backgroundColor ?? Colors.blueGrey[100],
-        hoverColor: hoverColor,
+        hoverColor: hoverColor?? const Color.fromARGB(255, 112, 187, 171),
         child: Text(
           texto,
           style: TextStyle(fontSize: 20, color: Colors.black ),
