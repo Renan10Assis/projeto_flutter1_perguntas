@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import './questao.dart';
 import './resposta.dart';
-main() => runApp(PerguntaApp(titulo: "Meu APP de Perguntas"));
+void main() => runApp(PerguntaApp(titulo: "Meu APP de Perguntas"));
 
 class _PerguntaAppState extends State<PerguntaApp> {
   var _perguntaSelecionada = 0;
@@ -39,7 +39,10 @@ class PerguntaApp extends StatefulWidget {
   final String titulo;
 
   const PerguntaApp({super.key, required this.titulo});
-
+/* outra forma
   @override
-  _PerguntaAppState createState() => _PerguntaAppState();
+  _PerguntaAppState createState() => _PerguntaAppState(); 
+*/
+  @override
+  State<PerguntaApp> createState() => _PerguntaAppState();
 }
