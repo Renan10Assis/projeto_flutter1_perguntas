@@ -2,16 +2,18 @@ import 'package:flutter/material.dart';
 
 class Resposta extends StatelessWidget {
   final String texto;
-  final VoidCallback? onSelected;
+  final int index;
+  final void Function(int) onSelected;
   final Color? hoverColor;
   final Color? backgroundColor;
 
   const Resposta({
     super.key,
     required this.texto,
+    required this.index,
     this.backgroundColor,
     this.hoverColor,
-    this.onSelected,
+    required this.onSelected,
   });
 
   @override
@@ -20,7 +22,7 @@ class Resposta extends StatelessWidget {
       width: double.infinity,
       margin: EdgeInsets.all(2),
       child: FloatingActionButton(
-        onPressed: onSelected,
+        onPressed: ()=> onSelected(index),
         backgroundColor: backgroundColor ?? Colors.blueGrey[100],
         hoverColor: hoverColor?? const Color.fromARGB(255, 112, 187, 171),
         child: Text(

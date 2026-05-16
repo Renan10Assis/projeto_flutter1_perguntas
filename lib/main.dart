@@ -5,47 +5,27 @@ import './resposta.dart';
 void main() => runApp(PerguntaApp(titulo: "Meu APP de Perguntas"));
 
 class _PerguntaAppState extends State<PerguntaApp> {
-  var _perguntaSelecionada = 0;
+  int _perguntaSelecionada = 0;
   Color? _corSelecionada;
+  final List _coresAPP = [
+    Colors.blue,
+    Colors.red,
+    Colors.green,
+    Colors.amber,
+    Colors.grey,
+  ];
 
-  Color _getCorDinamica(int elementIndex) {
-    switch (elementIndex) {
-      case 0:
-        return Colors.blue;
-      case 1:
-        return Colors.red;
-      case 2:
-        return Colors.green;
-      case 3:
-        return Colors.amber;
-      default:
-        return Colors.grey;
-    }
+  Color _getCorDinamica(List elements, String element) {
+    return _coresAPP[elements.indexOf(element)];
   }
 
-  void _responder(int indexMaximo, String cor) {
-    if (_perguntaSelecionada == 0) {
-      setState(() {
-        switch (cor) {
-          case "Azul":
-            _corSelecionada = Colors.blue;
-          case "Vermelho":
-            _corSelecionada = Colors.red;
-          case "Verde":
-            _corSelecionada = Colors.green;
-          case "Amarelo":
-            _corSelecionada = Colors.amber;
-          default:
-            _corSelecionada = Colors.grey;
-        }
-      });
-    }
-
-    if (_perguntaSelecionada < indexMaximo - 1) {
-      setState(() {
-        _perguntaSelecionada++;
-      });
-    }
+  void _responder(int index) {
+    setState(() {
+      if (_perguntaSelecionada == 0) {
+        _corSelecionada = _coresAPP[index];
+      }
+      _perguntaSelecionada++;
+    });
   }
 
   @override
@@ -61,10 +41,13 @@ class _PerguntaAppState extends State<PerguntaApp> {
         'resposta': ['Coelho', 'Cobra', 'Elefante', 'Leão'],
       },
       {
-        'texto': 'Qual é o seu instrutor favorito?',
+        'texto': 'Qual é o nome mais legal?',
         'resposta': ['Maria', 'João', 'Leo', 'Pedro'],
       },
     ];
+
+    List<String> respostas =
+        perguntas[_perguntaSelecionada]['resposta'] as List<String>;
 
     return MaterialApp(
       home: Scaffold(
@@ -72,18 +55,22 @@ class _PerguntaAppState extends State<PerguntaApp> {
         body: Column(
           children: <Widget>[
             Questao(texto: perguntas[_perguntaSelecionada]['texto'].toString()),
-            for (var entry
-                in (perguntas[_perguntaSelecionada]['resposta'] as List)
-                    .asMap()
-                    .entries)
-              //converti para map para pegar a key, para atribuir as cores do hover, para a primeira pergunta
-              Resposta(
+            //REFATORADO CODIGO PARA DECLARATIVO (O que fazer) AO INVES DE IMPERATIVO (COMO FAZER):
+            ...respostas.asMap().entries.map(
+              (entry) => Resposta(
                 texto: entry.value,
-                onSelected: () => _responder(perguntas.length, entry.value),
+                index: entry.key,
+                onSelected: _perguntaSelecionada + 1 < perguntas.length
+                    ? _responder
+                    : (i){}, //no else retorna vazio por enquanto, como o componente existe Function(int), passar função vazia com argumento vazio (i)
                 hoverColor: _perguntaSelecionada == 0
-                    ? _getCorDinamica(entry.key)
+                    ? _getCorDinamica(
+                        respostas,
+                        entry.value,
+                      ) //indexOf pois t não recebe strings iguais, se recebesse usaria a abordagem com Map
                     : _corSelecionada,
               ),
+            ),
           ],
         ),
       ),
