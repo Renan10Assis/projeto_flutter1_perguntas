@@ -6,17 +6,39 @@ void main() => runApp(PerguntaApp(titulo: "Meu APP de Perguntas"));
 
 class _PerguntaAppState extends State<PerguntaApp> {
   int _perguntaSelecionada = 0;
-  Color? _corSelecionada;
-  final List _coresAPP = [
-    Colors.blue,
-    Colors.red,
-    Colors.green,
-    Colors.amber,
-    Colors.grey,
+  final _perguntas = const [
+    //inferência de List<Map<String, Object>>
+    {
+      'texto': 'Qual é a sua cor favorita?',
+      'respostas': ['Azul', 'Vermelho', 'Verde', 'Amarelo'],
+    },
+    {
+      'texto': 'Qual é o seu animal favorito?',
+      'respostas': ['Coelho', 'Cobra', 'Elefante', 'Leão'],
+    },
+    {
+      'texto': 'Qual é o nome mais legal?',
+      'respostas': ['Maria', 'João', 'Leo', 'Pedro'],
+    },
   ];
 
+  bool get temPerguntaSelecionada {
+    return _perguntaSelecionada < _perguntas.length;
+  }
+
+  List<String> get respostas {
+    return temPerguntaSelecionada
+        ? _perguntas[_perguntaSelecionada]['respostas'] as List<String>
+        : [];
+  } //
+
+  Color? _corSelecionada;
+  final List _coresAPP = [Colors.blue, Colors.red, Colors.green, Colors.amber];
+
   Color _getCorDinamica(List elements, String element) {
-    return _coresAPP[elements.indexOf(element)];
+    return _perguntaSelecionada == 0
+        ? _coresAPP[elements.indexOf(element)]
+        : _corSelecionada;
   }
 
   void _responder(int index) {
@@ -30,49 +52,27 @@ class _PerguntaAppState extends State<PerguntaApp> {
 
   @override
   Widget build(BuildContext context) {
-    final perguntas = [
-      //inferência de List<Map<String, Object>>
-      {
-        'texto': 'Qual é a sua cor favorita?',
-        'resposta': ['Azul', 'Vermelho', 'Verde', 'Amarelo'],
-      },
-      {
-        'texto': 'Qual é o seu animal favorito?',
-        'resposta': ['Coelho', 'Cobra', 'Elefante', 'Leão'],
-      },
-      {
-        'texto': 'Qual é o nome mais legal?',
-        'resposta': ['Maria', 'João', 'Leo', 'Pedro'],
-      },
-    ];
-
-    List<String> respostas =
-        perguntas[_perguntaSelecionada]['resposta'] as List<String>;
-
     return MaterialApp(
       home: Scaffold(
         appBar: AppBar(title: Text(widget.titulo), centerTitle: true),
-        body: Column(
-          children: <Widget>[
-            Questao(texto: perguntas[_perguntaSelecionada]['texto'].toString()),
-            //REFATORADO CODIGO PARA DECLARATIVO (O que fazer) AO INVES DE IMPERATIVO (COMO FAZER):
-            ...respostas.asMap().entries.map(
-              (entry) => Resposta(
-                texto: entry.value,
-                index: entry.key,
-                onSelected: _perguntaSelecionada + 1 < perguntas.length
-                    ? _responder
-                    : (i){}, //no else retorna vazio por enquanto, como o componente existe Function(int), passar função vazia com argumento vazio (i)
-                hoverColor: _perguntaSelecionada == 0
-                    ? _getCorDinamica(
-                        respostas,
-                        entry.value,
-                      ) //indexOf pois t não recebe strings iguais, se recebesse usaria a abordagem com Map
-                    : _corSelecionada,
-              ),
-            ),
-          ],
-        ),
+        body: temPerguntaSelecionada
+            ? Column(
+                children: <Widget>[
+                  Questao(
+                    texto: _perguntas[_perguntaSelecionada]['texto'].toString(),
+                  ),
+                  //REFATORADO CODIGO PARA DECLARATIVO (O que fazer) AO INVES DE IMPERATIVO (COMO FAZER):
+                  ...respostas.asMap().entries.map(
+                    (entry) => Resposta(
+                      texto: entry.value,
+                      index: entry.key,
+                      onSelected: _responder,
+                      hoverColor: _getCorDinamica(respostas, entry.value),
+                    ),
+                  ),
+                ],
+              )
+            : Center(child: Text("Parabéns", style: TextStyle(fontSize: 28))),
       ),
     );
   }
