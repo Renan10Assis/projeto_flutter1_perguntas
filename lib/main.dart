@@ -1,11 +1,14 @@
 import 'package:flutter/material.dart';
-import './questao.dart';
-import './resposta.dart';
+import './resultado.dart';
+import './questionario.dart';
 
 void main() => runApp(PerguntaApp(titulo: "Meu APP de Perguntas"));
 
 class _PerguntaAppState extends State<PerguntaApp> {
+
   int _perguntaSelecionada = 0;
+  Color _corSelecionada = Colors.black;
+
   final _perguntas = const [
     //inferência de List<Map<String, Object>>
     {
@@ -22,31 +25,20 @@ class _PerguntaAppState extends State<PerguntaApp> {
     },
   ];
 
-  bool get temPerguntaSelecionada {
-    return _perguntaSelecionada < _perguntas.length;
-  }
-
-  List<String> get respostas {
+  List<String> get _respostas {
     return temPerguntaSelecionada
         ? _perguntas[_perguntaSelecionada]['respostas'] as List<String>
         : [];
-  } //
+  } 
 
-  Color? _corSelecionada;
-  final List _coresAPP = [Colors.blue, Colors.red, Colors.green, Colors.amber];
-
-  Color _getCorDinamica(List elements, String element) {
-    return _perguntaSelecionada == 0
-        ? _coresAPP[elements.indexOf(element)]
-        : _corSelecionada;
+  bool get temPerguntaSelecionada {
+    return _perguntaSelecionada < _perguntas.length;
   }
-
-  void _responder(int index) {
+//
+  void getProximaPergunta(Color corSelecionada){
     setState(() {
-      if (_perguntaSelecionada == 0) {
-        _corSelecionada = _coresAPP[index];
-      }
       _perguntaSelecionada++;
+      _corSelecionada = corSelecionada;
     });
   }
 
@@ -56,23 +48,9 @@ class _PerguntaAppState extends State<PerguntaApp> {
       home: Scaffold(
         appBar: AppBar(title: Text(widget.titulo), centerTitle: true),
         body: temPerguntaSelecionada
-            ? Column(
-                children: <Widget>[
-                  Questao(
-                    texto: _perguntas[_perguntaSelecionada]['texto'].toString(),
-                  ),
-                  //REFATORADO CODIGO PARA DECLARATIVO (O que fazer) AO INVES DE IMPERATIVO (COMO FAZER):
-                  ...respostas.asMap().entries.map(
-                    (entry) => Resposta(
-                      texto: entry.value,
-                      index: entry.key,
-                      onSelected: _responder,
-                      hoverColor: _getCorDinamica(respostas, entry.value),
-                    ),
-                  ),
-                ],
-              )
-            : Center(child: Text("Parabéns", style: TextStyle(fontSize: 28))),
+            ? Questionario(perguntas: _perguntas, respostas: _respostas, onSelected: getProximaPergunta, perguntaSelecionada: _perguntaSelecionada)
+            : Center(
+              child: Resultado(texto: 'PARABÉNS', cor: _corSelecionada)),
       ),
     );
   }
